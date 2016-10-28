@@ -33,7 +33,7 @@ http://tools.android.com/tech-docs/new-build-system/user-guide/apk-splits
 # Usage
 If you just want to use Bypass without using your own Spans check out http://uncodin.github.io/bypass/
 
-If you want to use your own Spans for some Elements you'll have to override DefaultSpanProvider. E.g.:
+If you want to use your own Spans for some Elements you'll have to extend DefaultSpanProvider. E.g.:
 
 ```java
 class CustomSpanProvider extends DefaultSpanProvider {
