@@ -280,9 +280,9 @@ public class Bypass {
 			case BLOCK_QUOTE:
 				// We add two leading margin spans so that when the order is reversed,
 				// the QuoteSpan will always be in the same spot.
-				if(mOptions.mDrawBlockquoteMargin) setBlockSpan(builder, new LeadingMarginSpan.Standard(mBlockQuoteIndent));
+				setBlockSpan(builder, new LeadingMarginSpan.Standard(mBlockQuoteIndent));
 				setBlockSpan(builder, mSpanProvider.onCreateQuoteSpan(mOptions.mBlockQuoteColor));
-				if(mOptions.mDrawBlockquoteMargin) setBlockSpan(builder, new LeadingMarginSpan.Standard(mBlockQuoteIndent));
+				setBlockSpan(builder, new LeadingMarginSpan.Standard(mBlockQuoteIndent));
 				setBlockSpan(builder, new StyleSpan(mOptions.mBlockquoteTypeface));
 				break;
 			case STRIKETHROUGH:
@@ -326,7 +326,6 @@ public class Bypass {
 		@TypefaceDef
 		private int mBlockquoteTypeface;
 		private float mBlockQuoteIndentSize;
-		private boolean mDrawBlockquoteMargin;
 
 		private int mCodeBlockIndentUnit;
 		private float mCodeBlockIndentSize;
@@ -355,7 +354,6 @@ public class Bypass {
 			mBlockQuoteIndentUnit = TypedValue.COMPLEX_UNIT_DIP;
 			mBlockQuoteIndentSize = 10;
 			mBlockquoteTypeface = Typeface.ITALIC;
-			mDrawBlockquoteMargin = true;
 
 			mCodeBlockIndentUnit = TypedValue.COMPLEX_UNIT_DIP;
 			mCodeBlockIndentSize = 10;
@@ -456,11 +454,6 @@ public class Bypass {
 
 		public Options setBlockquoteTypeface(@TypefaceDef int typeface) {
 			mBlockquoteTypeface = typeface;
-			return this;
-		}
-
-		public Options setDrawBlockquoteMargin(boolean draw) {
-			mDrawBlockquoteMargin = draw;
 			return this;
 		}
 	}
