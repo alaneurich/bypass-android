@@ -31,7 +31,35 @@ reduce your APK size, use the ABI filtering/splitting techniques in the Android 
 http://tools.android.com/tech-docs/new-build-system/user-guide/apk-splits
 
 # Usage
-See http://uncodin.github.io/bypass/
+If you just want to use Bypass without using Custom Spans check out http://uncodin.github.io/bypass/
+
+If you want to use your own Spans for some Elements you'll have to override DefaultSpanProvider. E.g.:
+
+```java
+class CustomSpanProvider extends DefaultSpanProvider {
+
+    public CustomSpanProvider(Bypass.Options bypassOptions) {
+        super(bypassOptions);
+    }
+
+    @Override
+    public Object[] onCreateLinkSpans(String url) {
+        return new Object[] {
+                new ClickableUrlSpan(url),
+                new StyleSpan(Typeface.ITALIC)
+        };
+    }
+}
+```
+
+Now, when instantiating Bypass just do the following:
+
+```java
+Bypass.Options options = new Bypass.Options();
+Bypass bypass = new Bypass(this, options, new CustomSpanProvider(options));
+```
+
+That's it! :) Your CustomSpanProvider will now create all Links in Italic. And there are a lot more methods to override. Just check out the Source Code to understand how the methods normally create their Spans.
 
 # Robolectric
 See [this issue](https://github.com/Commit451/bypasses/issues/2) for an explination for getting Robolectric to work.
