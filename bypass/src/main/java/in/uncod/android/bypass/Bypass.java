@@ -18,7 +18,8 @@ import android.util.TypedValue;
 import in.uncod.android.bypass.Element.Type;
 import in.uncod.android.bypass.provider.BaseSpanProvider;
 import in.uncod.android.bypass.provider.DefaultSpanProvider;
-import in.uncod.android.bypass.provider.TypefaceDef;
+import in.uncod.android.bypass.provider.TypefaceFamilyDef;
+import in.uncod.android.bypass.provider.TypefaceFormatDef;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -55,7 +56,7 @@ public class Bypass {
 		mCodeBlockIndent = 10;
 		mHruleSize = 2;
 		mHruleTopBottomPadding = 20;
-		mSpanProvider = new DefaultSpanProvider();
+		mSpanProvider = new DefaultSpanProvider(mOptions);
 	}
 
 	public Bypass(Context context) {
@@ -63,7 +64,7 @@ public class Bypass {
 	}
 
 	public Bypass(Context context, Options options) {
-		this(context, options, new DefaultSpanProvider());
+		this(context, options, null);
 	}
 
 	public Bypass(Context context, Options options, BaseSpanProvider spanProvider) {
@@ -85,7 +86,7 @@ public class Bypass {
 
 		mHruleTopBottomPadding = (int) dm.density * 10;
 
-		mSpanProvider = spanProvider != null ? spanProvider : new DefaultSpanProvider();
+		mSpanProvider = spanProvider != null ? spanProvider : new DefaultSpanProvider(mOptions);
 	}
 
 	public CharSequence markdownToSpannable(String markdown) {
@@ -246,27 +247,25 @@ public class Bypass {
 			case HEADER:
 				String levelStr = element.getAttribute("level");
 				int level = Integer.parseInt(levelStr);
-				setSpan(builder, new RelativeSizeSpan(mOptions.mHeaderSizes[level - 1]));
-				setSpan(builder, new StyleSpan(Typeface.BOLD));
+				setSpans(builder, mSpanProvider.onCreateHeaderSpans(level));
 				break;
 			case LIST:
-				setBlockSpan(builder, new LeadingMarginSpan.Standard(mListItemIndent));
+				setBlockSpans(builder, mSpanProvider.onCreateListSpans(mListItemIndent));
 				break;
 			case EMPHASIS:
-				setSpan(builder, new StyleSpan(Typeface.ITALIC));
+				setSpans(builder, mSpanProvider.onCreateEmphasisSpans());
 				break;
 			case DOUBLE_EMPHASIS:
-				setSpan(builder, new StyleSpan(Typeface.BOLD));
+				setSpans(builder, mSpanProvider.onCreateDoubleEmphasisSpans());
 				break;
 			case TRIPLE_EMPHASIS:
-				setSpan(builder, new StyleSpan(Typeface.BOLD_ITALIC));
+				setSpans(builder, mSpanProvider.onCreateTripleEmphasisSpans());
 				break;
 			case BLOCK_CODE:
-				setSpan(builder, new LeadingMarginSpan.Standard(mCodeBlockIndent));
-				setSpan(builder, new TypefaceSpan("monospace"));
+				setSpans(builder, mSpanProvider.onCreateCodeBlockSpans(mCodeBlockIndent));
 				break;
 			case CODE_SPAN:
-				setSpan(builder, new TypefaceSpan("monospace"));
+				setSpans(builder, mSpanProvider.onCreateCodeLineSpans());
 				break;
 			case LINK:
 			case AUTOLINK:
@@ -274,31 +273,41 @@ public class Bypass {
 				if (!TextUtils.isEmpty(link) && Patterns.EMAIL_ADDRESS.matcher(link).matches()) {
 					link = "mailto:" + link;
 				}
-
-				setSpan(builder, mSpanProvider.onCreateUrlSpan(link));
+				setSpans(builder, mSpanProvider.onCreateLinkSpans(link));
 				break;
 			case BLOCK_QUOTE:
 				// We add two leading margin spans so that when the order is reversed,
 				// the QuoteSpan will always be in the same spot.
-				setBlockSpan(builder, new LeadingMarginSpan.Standard(mBlockQuoteIndent));
-				setBlockSpan(builder, mSpanProvider.onCreateQuoteSpan(mOptions.mBlockQuoteColor));
-				setBlockSpan(builder, new LeadingMarginSpan.Standard(mBlockQuoteIndent));
-				setBlockSpan(builder, new StyleSpan(mOptions.mBlockquoteTypeface));
+				setBlockSpans(builder, mSpanProvider.onCreateBlockquoteSpans(mBlockQuoteIndent));
 				break;
 			case STRIKETHROUGH:
-				setSpan(builder, mSpanProvider.onCreateStrikethroughSpan());
+				setSpans(builder, mSpanProvider.onCreateStrikethroughSpans());
 				break;
 			case HRULE:
-				setSpan(builder, mSpanProvider.onCreateHorizontalLineSpan(mOptions.mHruleColor, mHruleSize, mHruleTopBottomPadding));
+				setSpans(builder, mSpanProvider.onCreateHorizontalLineSpans(mHruleSize, mHruleTopBottomPadding));
 				break;
 			case IMAGE:
 				if (imageDrawable != null) {
-					setSpan(builder, new ImageSpan(imageDrawable));
+					setSpans(builder, mSpanProvider.onCreateImageSpans(imageDrawable));
 				}
 				break;
 		}
 
 		return builder;
+	}
+
+	private static void setSpans(SpannableStringBuilder builder, Object[] objects) {
+		if(objects == null) return;
+		for(Object object : objects) {
+			setSpan(builder, object);
+		}
+	}
+
+	private static void setBlockSpans(SpannableStringBuilder builder, Object[] objects) {
+		if(objects == null) return;
+		for(Object object : objects) {
+			setBlockSpan(builder, object);
+		}
 	}
 
 	private static void setSpan(SpannableStringBuilder builder, Object what) {
@@ -315,26 +324,34 @@ public class Bypass {
 	 * Configurable options for how Bypass renders certain elements.
 	 */
 	public static final class Options {
-		private float[] mHeaderSizes;
+		public float[] mHeaderSizes;
 
-		private String mUnorderedListItem;
-		private int mListItemIndentUnit;
-		private float mListItemIndentSize;
+		public String mUnorderedListItem;
+		public int mListItemIndentUnit;
+		public float mListItemIndentSize;
 
-		private int mBlockQuoteColor;
-		private int mBlockQuoteIndentUnit;
-		@TypefaceDef
-		private int mBlockquoteTypeface;
-		private float mBlockQuoteIndentSize;
+		public int mBlockQuoteColor;
+		public int mBlockQuoteIndentUnit;
+		@TypefaceFormatDef
+		public int mBlockquoteTypefaceFormat;
+		public boolean mOverrideBlockquoteTypefaceFamily;
+		@TypefaceFamilyDef
+		public String mBlockquoteTypefaceFamily;
+		public float mBlockQuoteIndentSize;
 
-		private int mCodeBlockIndentUnit;
-		private float mCodeBlockIndentSize;
+		@TypefaceFormatDef
+		public int mCodeBlockTypefaceFormat;
+		public boolean mOverrideCodeBlockTypefaceFamily;
+		@TypefaceFamilyDef
+		public String mCodeBlockTypefaceFamily;
+		public int mCodeBlockIndentUnit;
+		public float mCodeBlockIndentSize;
 
-		private int mHruleColor;
-		private int mHruleUnit;
-		private float mHruleSize;
+		public int mHruleColor;
+		public int mHruleUnit;
+		public float mHruleSize;
 
-		private boolean mAppendAuthorityToTextLinks;
+		public boolean mAppendAuthorityToTextLinks;
 
 		public Options() {
 			mHeaderSizes = new float[] {
@@ -353,8 +370,13 @@ public class Bypass {
 			mBlockQuoteColor = 0xff0000ff;
 			mBlockQuoteIndentUnit = TypedValue.COMPLEX_UNIT_DIP;
 			mBlockQuoteIndentSize = 10;
-			mBlockquoteTypeface = Typeface.ITALIC;
+			mBlockquoteTypefaceFormat = Typeface.ITALIC;
+			mBlockquoteTypefaceFamily = BaseSpanProvider.TYPEFACE_FAMILY_DEFAULT;
+			mOverrideBlockquoteTypefaceFamily = false;
 
+			mCodeBlockTypefaceFamily = BaseSpanProvider.TYPEFACE_FAMILY_MONOSPACE;
+			mOverrideCodeBlockTypefaceFamily = true;
+			mCodeBlockTypefaceFormat = Typeface.NORMAL;
 			mCodeBlockIndentUnit = TypedValue.COMPLEX_UNIT_DIP;
 			mCodeBlockIndentSize = 10;
 
@@ -436,6 +458,17 @@ public class Bypass {
 			return this;
 		}
 
+		public Options setCodeBlockTypefaceFormat(@TypefaceFormatDef int typeface) {
+			mCodeBlockTypefaceFormat = typeface;
+			return this;
+		}
+
+		public Options setCodeBlockTypefaceFamily(@TypefaceFamilyDef String family) {
+			mOverrideCodeBlockTypefaceFamily = !family.equals(BaseSpanProvider.TYPEFACE_FAMILY_DEFAULT);
+			mCodeBlockTypefaceFamily = family;
+			return this;
+		}
+
 		public Options setHruleColor(int color) {
 			mHruleColor = color;
 			return this;
@@ -452,8 +485,14 @@ public class Bypass {
 			return this;
 		}
 
-		public Options setBlockquoteTypeface(@TypefaceDef int typeface) {
-			mBlockquoteTypeface = typeface;
+		public Options setBlockquoteTypefaceFamily(@TypefaceFamilyDef String family) {
+			mOverrideBlockquoteTypefaceFamily = !family.equals(BaseSpanProvider.TYPEFACE_FAMILY_DEFAULT);
+			mBlockquoteTypefaceFamily = family;
+			return this;
+		}
+
+		public Options setBlockquoteTypefaceFormat(@TypefaceFormatDef int typeface) {
+			mBlockquoteTypefaceFormat = typeface;
 			return this;
 		}
 	}
