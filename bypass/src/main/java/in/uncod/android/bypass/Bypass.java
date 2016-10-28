@@ -9,17 +9,16 @@ import android.text.SpannableStringBuilder;
 import android.text.TextUtils;
 import android.text.style.ImageSpan;
 import android.text.style.LeadingMarginSpan;
-import android.text.style.QuoteSpan;
 import android.text.style.RelativeSizeSpan;
-import android.text.style.StrikethroughSpan;
 import android.text.style.StyleSpan;
 import android.text.style.TypefaceSpan;
-import android.text.style.URLSpan;
 import android.util.DisplayMetrics;
 import android.util.Patterns;
 import android.util.TypedValue;
 import in.uncod.android.bypass.Element.Type;
-import in.uncod.android.bypass.style.HorizontalLineSpan;
+import in.uncod.android.bypass.provider.BaseSpanProvider;
+import in.uncod.android.bypass.provider.DefaultSpanProvider;
+import in.uncod.android.bypass.provider.TypefaceDef;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -30,6 +29,8 @@ public class Bypass {
 	}
 
 	private final Options mOptions;
+
+	private final BaseSpanProvider mSpanProvider;
 
 	private final int mListItemIndent;
 	private final int mBlockQuoteIndent;
@@ -54,6 +55,7 @@ public class Bypass {
 		mCodeBlockIndent = 10;
 		mHruleSize = 2;
 		mHruleTopBottomPadding = 20;
+		mSpanProvider = new DefaultSpanProvider();
 	}
 
 	public Bypass(Context context) {
@@ -61,7 +63,11 @@ public class Bypass {
 	}
 
 	public Bypass(Context context, Options options) {
-		mOptions = options;
+		this(context, options, new DefaultSpanProvider());
+	}
+
+	public Bypass(Context context, Options options, BaseSpanProvider spanProvider) {
+		mOptions = options != null ? options : new Options();
 
 		DisplayMetrics dm = context.getResources().getDisplayMetrics();
 
@@ -78,6 +84,8 @@ public class Bypass {
 			mOptions.mHruleSize, dm);
 
 		mHruleTopBottomPadding = (int) dm.density * 10;
+
+		mSpanProvider = spanProvider != null ? spanProvider : new DefaultSpanProvider();
 	}
 
 	public CharSequence markdownToSpannable(String markdown) {
@@ -97,6 +105,8 @@ public class Bypass {
 		return TextUtils.concat(spans);
 	}
 
+
+	@SuppressWarnings("JniMissingFunction")
 	private native Document processMarkdown(String markdown);
 
 	// The 'numberOfSiblings' parameters refers to the number of siblings within the parent, including
@@ -226,6 +236,9 @@ public class Bypass {
 				else {
 					builder.append("\n\n");
 				}
+			} else if(type == Type.LINK && mOptions.mAppendAuthorityToTextLinks) {
+				String link = element.getAttribute("link");
+				builder.append(mSpanProvider.onCreateAuthorityString(link));
 			}
 		}
 
@@ -261,21 +274,22 @@ public class Bypass {
 				if (!TextUtils.isEmpty(link) && Patterns.EMAIL_ADDRESS.matcher(link).matches()) {
 					link = "mailto:" + link;
 				}
-				setSpan(builder, new URLSpan(link));
+
+				setSpan(builder, mSpanProvider.onUrlSpanNeeded(link));
 				break;
 			case BLOCK_QUOTE:
 				// We add two leading margin spans so that when the order is reversed,
 				// the QuoteSpan will always be in the same spot.
-				setBlockSpan(builder, new LeadingMarginSpan.Standard(mBlockQuoteIndent));
-				setBlockSpan(builder, new QuoteSpan(mOptions.mBlockQuoteColor));
-				setBlockSpan(builder, new LeadingMarginSpan.Standard(mBlockQuoteIndent));
-				setBlockSpan(builder, new StyleSpan(Typeface.ITALIC));
+				if(mOptions.mDrawBlockquoteMargin) setBlockSpan(builder, new LeadingMarginSpan.Standard(mBlockQuoteIndent));
+				setBlockSpan(builder, mSpanProvider.onQuoteSpanNeed(mOptions.mBlockQuoteColor));
+				if(mOptions.mDrawBlockquoteMargin) setBlockSpan(builder, new LeadingMarginSpan.Standard(mBlockQuoteIndent));
+				setBlockSpan(builder, new StyleSpan(mOptions.mBlockquoteTypeface));
 				break;
 			case STRIKETHROUGH:
-				setSpan(builder, new StrikethroughSpan());
+				setSpan(builder, mSpanProvider.onStrikethroughSpanNeeded());
 				break;
 			case HRULE:
-				setSpan(builder, new HorizontalLineSpan(mOptions.mHruleColor, mHruleSize, mHruleTopBottomPadding));
+				setSpan(builder, mSpanProvider.onHorizontalLineSpanNeeded(mOptions.mHruleColor, mHruleSize, mHruleTopBottomPadding));
 				break;
 			case IMAGE:
 				if (imageDrawable != null) {
@@ -309,7 +323,10 @@ public class Bypass {
 
 		private int mBlockQuoteColor;
 		private int mBlockQuoteIndentUnit;
+		@TypefaceDef
+		private int mBlockquoteTypeface;
 		private float mBlockQuoteIndentSize;
+		private boolean mDrawBlockquoteMargin;
 
 		private int mCodeBlockIndentUnit;
 		private float mCodeBlockIndentSize;
@@ -317,6 +334,8 @@ public class Bypass {
 		private int mHruleColor;
 		private int mHruleUnit;
 		private float mHruleSize;
+
+		private boolean mAppendAuthorityToTextLinks;
 
 		public Options() {
 			mHeaderSizes = new float[] {
@@ -335,6 +354,8 @@ public class Bypass {
 			mBlockQuoteColor = 0xff0000ff;
 			mBlockQuoteIndentUnit = TypedValue.COMPLEX_UNIT_DIP;
 			mBlockQuoteIndentSize = 10;
+			mBlockquoteTypeface = Typeface.ITALIC;
+			mDrawBlockquoteMargin = true;
 
 			mCodeBlockIndentUnit = TypedValue.COMPLEX_UNIT_DIP;
 			mCodeBlockIndentSize = 10;
@@ -342,6 +363,8 @@ public class Bypass {
 			mHruleColor = Color.GRAY;
 			mHruleUnit = TypedValue.COMPLEX_UNIT_DIP;
 			mHruleSize = 1;
+
+			mAppendAuthorityToTextLinks = false;
 		}
 
 		public Options setHeaderSizes(float[] headerSizes) {
@@ -393,6 +416,21 @@ public class Bypass {
 		public Options setHruleSize(int unit, float size) {
 			mHruleUnit = unit;
 			mHruleSize = size;
+			return this;
+		}
+
+		public Options setAppendAuthorityToTextLink(boolean append) {
+			mAppendAuthorityToTextLinks = append;
+			return this;
+		}
+
+		public Options setBlockquoteTypeface(@TypefaceDef int typeface) {
+			mBlockquoteTypeface = typeface;
+			return this;
+		}
+
+		public Options setDrawBlockquoteMargin(boolean draw) {
+			mDrawBlockquoteMargin = draw;
 			return this;
 		}
 	}
