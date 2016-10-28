@@ -31,13 +31,12 @@ reduce your APK size, use the ABI filtering/splitting techniques in the Android 
 http://tools.android.com/tech-docs/new-build-system/user-guide/apk-splits
 
 # Usage
-If you just want to use Bypass without using Custom Spans check out http://uncodin.github.io/bypass/
+If you just want to use Bypass without using your own Spans check out http://uncodin.github.io/bypass/
 
 If you want to use your own Spans for some Elements you'll have to override DefaultSpanProvider. E.g.:
 
 ```java
 class CustomSpanProvider extends DefaultSpanProvider {
-
     public CustomSpanProvider(Bypass.Options bypassOptions) {
         super(bypassOptions);
     }
@@ -70,6 +69,7 @@ This dependency also packages the Proguard rules [suggested](https://github.com/
 License
 --------
 
+    Copyright 2016 budsmile
     Copyright 2015 Commit 451
     Copyright 2015 Uncodin
 
