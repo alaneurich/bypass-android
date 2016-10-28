@@ -380,6 +380,36 @@ public class Bypass {
 			return this;
 		}
 
+		public Options setH1Size(float size) {
+			mHeaderSizes[0] = size;
+			return this;
+		}
+
+		public Options setH2Size(float size) {
+			mHeaderSizes[1] = size;
+			return this;
+		}
+
+		public Options setH3Size(float size) {
+			mHeaderSizes[2] = size;
+			return this;
+		}
+
+		public Options setH4Size(float size) {
+			mHeaderSizes[3] = size;
+			return this;
+		}
+
+		public Options setH5Size(float size) {
+			mHeaderSizes[4] = size;
+			return this;
+		}
+
+		public Options setH6Size(float size) {
+			mHeaderSizes[5] = size;
+			return this;
+		}
+
 		public Options setUnorderedListItem(String unorderedListItem) {
 			mUnorderedListItem = unorderedListItem;
 			return this;
