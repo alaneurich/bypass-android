@@ -7,11 +7,6 @@ import android.graphics.drawable.Drawable;
 import android.text.Spannable;
 import android.text.SpannableStringBuilder;
 import android.text.TextUtils;
-import android.text.style.ImageSpan;
-import android.text.style.LeadingMarginSpan;
-import android.text.style.RelativeSizeSpan;
-import android.text.style.StyleSpan;
-import android.text.style.TypefaceSpan;
 import android.util.DisplayMetrics;
 import android.util.Patterns;
 import android.util.TypedValue;
@@ -72,17 +67,17 @@ public class Bypass {
 
 		DisplayMetrics dm = context.getResources().getDisplayMetrics();
 
-		mListItemIndent = (int) TypedValue.applyDimension(mOptions.mListItemIndentUnit,
-			mOptions.mListItemIndentSize, dm);
+		mListItemIndent = (int) TypedValue.applyDimension(mOptions.getListItemIndentUnit(),
+				mOptions.getListItemIndentSize(), dm);
 
-		mBlockQuoteIndent = (int) TypedValue.applyDimension(mOptions.mBlockQuoteIndentUnit,
-			mOptions.mBlockQuoteIndentSize, dm);
+		mBlockQuoteIndent = (int) TypedValue.applyDimension(mOptions.getBlockQuoteIndentUnit(),
+				mOptions.getBlockQuoteIndentSize(), dm);
 
-		mCodeBlockIndent = (int) TypedValue.applyDimension(mOptions.mCodeBlockIndentUnit,
-			mOptions.mCodeBlockIndentSize, dm);
+		mCodeBlockIndent = (int) TypedValue.applyDimension(mOptions.getCodeBlockIndentUnit(),
+				mOptions.getCodeBlockIndentSize(), dm);
 
-		mHruleSize = (int) TypedValue.applyDimension(mOptions.mHruleUnit,
-			mOptions.mHruleSize, dm);
+		mHruleSize = (int) TypedValue.applyDimension(mOptions.getHruleUnit(),
+				mOptions.getHruleSize(), dm);
 
 		mHruleTopBottomPadding = (int) dm.density * 10;
 
@@ -178,7 +173,7 @@ public class Bypass {
 					mOrderedListNumber.put(element.getParent(), number + 1);
 				}
 				else {
-					builder.append(mOptions.mUnorderedListItem);
+					builder.append(mOptions.getUnorderedListItem());
 				}
 				builder.append("  ");
 				break;
@@ -237,7 +232,7 @@ public class Bypass {
 				else {
 					builder.append("\n\n");
 				}
-			} else if(type == Type.LINK && mOptions.mAppendAuthorityToTextLinks) {
+			} else if(type == Type.LINK && mOptions.isAppendAuthorityToTextLinks()) {
 				String link = element.getAttribute("link");
 				builder.append(mSpanProvider.onCreateAuthorityString(link));
 			}
@@ -324,34 +319,34 @@ public class Bypass {
 	 * Configurable options for how Bypass renders certain elements.
 	 */
 	public static final class Options {
-		public float[] mHeaderSizes;
+		private float[] mHeaderSizes;
 
-		public String mUnorderedListItem;
-		public int mListItemIndentUnit;
-		public float mListItemIndentSize;
+		private String mUnorderedListItem;
+		private int mListItemIndentUnit;
+		private float mListItemIndentSize;
 
-		public int mBlockQuoteColor;
-		public int mBlockQuoteIndentUnit;
+		private int mBlockQuoteColor;
+		private int mBlockQuoteIndentUnit;
 		@TypefaceFormatDef
-		public int mBlockquoteTypefaceFormat;
-		public boolean mOverrideBlockquoteTypefaceFamily;
+		private int mBlockquoteTypefaceFormat;
+		private boolean mOverrideBlockquoteTypefaceFamily;
 		@TypefaceFamilyDef
-		public String mBlockquoteTypefaceFamily;
-		public float mBlockQuoteIndentSize;
+		private String mBlockquoteTypefaceFamily;
+		private float mBlockQuoteIndentSize;
 
 		@TypefaceFormatDef
-		public int mCodeBlockTypefaceFormat;
-		public boolean mOverrideCodeBlockTypefaceFamily;
+		private int mCodeBlockTypefaceFormat;
+		private boolean mOverrideCodeBlockTypefaceFamily;
 		@TypefaceFamilyDef
-		public String mCodeBlockTypefaceFamily;
-		public int mCodeBlockIndentUnit;
-		public float mCodeBlockIndentSize;
+		private String mCodeBlockTypefaceFamily;
+		private int mCodeBlockIndentUnit;
+		private float mCodeBlockIndentSize;
 
-		public int mHruleColor;
-		public int mHruleUnit;
-		public float mHruleSize;
+		private int mHruleColor;
+		private int mHruleUnit;
+		private float mHruleSize;
 
-		public boolean mAppendAuthorityToTextLinks;
+		private boolean mAppendAuthorityToTextLinks;
 
 		public Options() {
 			mHeaderSizes = new float[] {
@@ -401,32 +396,32 @@ public class Bypass {
 		}
 
 		public Options setH1Size(float size) {
-			mHeaderSizes[0] = size;
+			getHeaderSizes()[0] = size;
 			return this;
 		}
 
 		public Options setH2Size(float size) {
-			mHeaderSizes[1] = size;
+			getHeaderSizes()[1] = size;
 			return this;
 		}
 
 		public Options setH3Size(float size) {
-			mHeaderSizes[2] = size;
+			getHeaderSizes()[2] = size;
 			return this;
 		}
 
 		public Options setH4Size(float size) {
-			mHeaderSizes[3] = size;
+			getHeaderSizes()[3] = size;
 			return this;
 		}
 
 		public Options setH5Size(float size) {
-			mHeaderSizes[4] = size;
+			getHeaderSizes()[4] = size;
 			return this;
 		}
 
 		public Options setH6Size(float size) {
-			mHeaderSizes[5] = size;
+			getHeaderSizes()[5] = size;
 			return this;
 		}
 
@@ -494,6 +489,82 @@ public class Bypass {
 		public Options setBlockquoteTypefaceFormat(@TypefaceFormatDef int typeface) {
 			mBlockquoteTypefaceFormat = typeface;
 			return this;
+		}
+
+		public float[] getHeaderSizes() {
+			return mHeaderSizes;
+		}
+
+		public String getUnorderedListItem() {
+			return mUnorderedListItem;
+		}
+
+		public int getListItemIndentUnit() {
+			return mListItemIndentUnit;
+		}
+
+		public float getListItemIndentSize() {
+			return mListItemIndentSize;
+		}
+
+		public int getBlockQuoteColor() {
+			return mBlockQuoteColor;
+		}
+
+		public int getBlockQuoteIndentUnit() {
+			return mBlockQuoteIndentUnit;
+		}
+
+		public int getBlockQuoteTypefaceFormat() {
+			return mBlockquoteTypefaceFormat;
+		}
+
+		public boolean isOverrideBlockquoteTypefaceFamily() {
+			return mOverrideBlockquoteTypefaceFamily;
+		}
+
+		public String getBlockquoteTypefaceFamily() {
+			return mBlockquoteTypefaceFamily;
+		}
+
+		public float getBlockQuoteIndentSize() {
+			return mBlockQuoteIndentSize;
+		}
+
+		public int getCodeBlockTypefaceFormat() {
+			return mCodeBlockTypefaceFormat;
+		}
+
+		public boolean isOverrideCodeBlockTypefaceFamily() {
+			return mOverrideCodeBlockTypefaceFamily;
+		}
+
+		public String getCodeBlockTypefaceFamily() {
+			return mCodeBlockTypefaceFamily;
+		}
+
+		public int getCodeBlockIndentUnit() {
+			return mCodeBlockIndentUnit;
+		}
+
+		public float getCodeBlockIndentSize() {
+			return mCodeBlockIndentSize;
+		}
+
+		public int getHruleColor() {
+			return mHruleColor;
+		}
+
+		public int getHruleUnit() {
+			return mHruleUnit;
+		}
+
+		public float getHruleSize() {
+			return mHruleSize;
+		}
+
+		public boolean isAppendAuthorityToTextLinks() {
+			return mAppendAuthorityToTextLinks;
 		}
 	}
 

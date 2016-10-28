@@ -24,7 +24,7 @@ public class DefaultSpanProvider extends BaseSpanProvider {
     @Override
     public Object[] onCreateHeaderSpans(int level) {
         return new Object[] {
-                new RelativeSizeSpan(mOptions.mHeaderSizes[level - 1]),
+                new RelativeSizeSpan(mOptions.getHeaderSizes()[level - 1]),
                 new StyleSpan(Typeface.BOLD)
         };
     }
@@ -60,11 +60,11 @@ public class DefaultSpanProvider extends BaseSpanProvider {
     @Override
     public Object[] onCreateCodeBlockSpans(int codeBlockIndent) {
         LeadingMarginSpan.Standard marginSpan = new LeadingMarginSpan.Standard(codeBlockIndent);
-        StyleSpan styleSpan = new StyleSpan(mOptions.mCodeBlockTypefaceFormat);
-        if(mOptions.mOverrideCodeBlockTypefaceFamily) {
+        StyleSpan styleSpan = new StyleSpan(mOptions.getCodeBlockTypefaceFormat());
+        if(mOptions.isOverrideCodeBlockTypefaceFamily()) {
             return new Object[] {
                     marginSpan,
-                    new TypefaceSpan(mOptions.mCodeBlockTypefaceFamily),
+                    new TypefaceSpan(mOptions.getCodeBlockTypefaceFamily()),
                     styleSpan
             };
         } else {
@@ -77,10 +77,10 @@ public class DefaultSpanProvider extends BaseSpanProvider {
 
     @Override
     public Object[] onCreateCodeLineSpans() {
-        StyleSpan styleSpan = new StyleSpan(mOptions.mCodeBlockTypefaceFormat);
-        if(mOptions.mOverrideCodeBlockTypefaceFamily) {
+        StyleSpan styleSpan = new StyleSpan(mOptions.getCodeBlockTypefaceFormat());
+        if(mOptions.isOverrideCodeBlockTypefaceFamily()) {
             return new Object[] {
-                    new TypefaceSpan(mOptions.mCodeBlockTypefaceFamily),
+                    new TypefaceSpan(mOptions.getCodeBlockTypefaceFamily()),
                     styleSpan
             };
         } else {
@@ -100,14 +100,14 @@ public class DefaultSpanProvider extends BaseSpanProvider {
     @Override
     public Object[] onCreateBlockquoteSpans(int blockquoteIndent) {
         LeadingMarginSpan marginSpan = new LeadingMarginSpan.Standard(blockquoteIndent);
-        QuoteSpan quoteSpan = new QuoteSpan(mOptions.mBlockQuoteColor);
-        StyleSpan styleSpan = new StyleSpan(mOptions.mBlockquoteTypefaceFormat);
-        if(mOptions.mOverrideCodeBlockTypefaceFamily) {
+        QuoteSpan quoteSpan = new QuoteSpan(mOptions.getBlockQuoteColor());
+        StyleSpan styleSpan = new StyleSpan(mOptions.getBlockQuoteTypefaceFormat());
+        if(mOptions.isOverrideCodeBlockTypefaceFamily()) {
             return new Object[] {
                     marginSpan,
                     quoteSpan,
                     marginSpan,
-                    new TypefaceSpan(mOptions.mBlockquoteTypefaceFamily),
+                    new TypefaceSpan(mOptions.getBlockquoteTypefaceFamily()),
                     styleSpan
             };
         } else {
@@ -130,7 +130,7 @@ public class DefaultSpanProvider extends BaseSpanProvider {
     @Override
     public Object[] onCreateHorizontalLineSpans(int lineHeight, int lineTopBottomPadding) {
         return new Object[] {
-                new HorizontalLineSpan(mOptions.mHruleColor, lineHeight, lineTopBottomPadding)
+                new HorizontalLineSpan(mOptions.getHruleColor(), lineHeight, lineTopBottomPadding)
         };
     }
 
