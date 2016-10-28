@@ -9,22 +9,22 @@ import in.uncod.android.bypass.style.HorizontalLineSpan;
 
 public class DefaultSpanProvider extends BaseSpanProvider {
     @Override
-    public Object onUrlSpanNeeded(String url) {
+    public Object onCreateUrlSpan(String url) {
         return new ClickableUrlSpan(url);
     }
 
     @Override
-    public Object onQuoteSpanNeed(int quoteColor) {
+    public Object onCreateQuoteSpan(int quoteColor) {
         return new QuoteSpan(quoteColor);
     }
 
     @Override
-    public Object onHorizontalLineSpanNeeded(int color, int size, int topBottomPadding) {
+    public Object onCreateHorizontalLineSpan(int color, int size, int topBottomPadding) {
         return new HorizontalLineSpan(color, size, topBottomPadding);
     }
 
     @Override
-    public Object onStrikethroughSpanNeeded() {
+    public Object onCreateStrikethroughSpan() {
         return new StrikethroughSpan();
     }
 

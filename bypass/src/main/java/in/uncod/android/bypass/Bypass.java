@@ -275,21 +275,21 @@ public class Bypass {
 					link = "mailto:" + link;
 				}
 
-				setSpan(builder, mSpanProvider.onUrlSpanNeeded(link));
+				setSpan(builder, mSpanProvider.onCreateUrlSpan(link));
 				break;
 			case BLOCK_QUOTE:
 				// We add two leading margin spans so that when the order is reversed,
 				// the QuoteSpan will always be in the same spot.
 				if(mOptions.mDrawBlockquoteMargin) setBlockSpan(builder, new LeadingMarginSpan.Standard(mBlockQuoteIndent));
-				setBlockSpan(builder, mSpanProvider.onQuoteSpanNeed(mOptions.mBlockQuoteColor));
+				setBlockSpan(builder, mSpanProvider.onCreateQuoteSpan(mOptions.mBlockQuoteColor));
 				if(mOptions.mDrawBlockquoteMargin) setBlockSpan(builder, new LeadingMarginSpan.Standard(mBlockQuoteIndent));
 				setBlockSpan(builder, new StyleSpan(mOptions.mBlockquoteTypeface));
 				break;
 			case STRIKETHROUGH:
-				setSpan(builder, mSpanProvider.onStrikethroughSpanNeeded());
+				setSpan(builder, mSpanProvider.onCreateStrikethroughSpan());
 				break;
 			case HRULE:
-				setSpan(builder, mSpanProvider.onHorizontalLineSpanNeeded(mOptions.mHruleColor, mHruleSize, mHruleTopBottomPadding));
+				setSpan(builder, mSpanProvider.onCreateHorizontalLineSpan(mOptions.mHruleColor, mHruleSize, mHruleTopBottomPadding));
 				break;
 			case IMAGE:
 				if (imageDrawable != null) {
