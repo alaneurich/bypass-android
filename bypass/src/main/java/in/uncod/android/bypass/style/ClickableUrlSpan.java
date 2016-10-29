@@ -4,16 +4,13 @@ import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
-import android.os.Parcel;
 import android.provider.Browser;
-import android.text.ParcelableSpan;
 import android.text.style.ClickableSpan;
 import android.util.Log;
 import android.view.View;
 
 public class ClickableUrlSpan extends ClickableSpan {
 
-    private final static int CLICK_URL_SPAN = 10000;
     private String mUrl;
 
     public ClickableUrlSpan(String url) {

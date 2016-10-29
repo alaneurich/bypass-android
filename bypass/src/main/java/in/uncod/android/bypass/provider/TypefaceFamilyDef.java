@@ -1,7 +1,5 @@
 package in.uncod.android.bypass.provider;
 
-import android.graphics.Typeface;
-import android.support.annotation.IntDef;
 import android.support.annotation.StringDef;
 
 import java.lang.annotation.Retention;

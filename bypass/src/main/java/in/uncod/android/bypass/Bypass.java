@@ -10,14 +10,15 @@ import android.text.TextUtils;
 import android.util.DisplayMetrics;
 import android.util.Patterns;
 import android.util.TypedValue;
+
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
 import in.uncod.android.bypass.Element.Type;
 import in.uncod.android.bypass.provider.BaseSpanProvider;
 import in.uncod.android.bypass.provider.DefaultSpanProvider;
 import in.uncod.android.bypass.provider.TypefaceFamilyDef;
 import in.uncod.android.bypass.provider.TypefaceFormatDef;
-
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 public class Bypass {
 	static {
