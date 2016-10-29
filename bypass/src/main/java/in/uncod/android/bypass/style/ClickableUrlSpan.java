@@ -11,7 +11,7 @@ import android.text.style.ClickableSpan;
 import android.util.Log;
 import android.view.View;
 
-public class ClickableUrlSpan extends ClickableSpan implements ParcelableSpan {
+public class ClickableUrlSpan extends ClickableSpan {
 
     private final static int CLICK_URL_SPAN = 10000;
     private String mUrl;
@@ -36,36 +36,4 @@ public class ClickableUrlSpan extends ClickableSpan implements ParcelableSpan {
             Log.w("URLSpan", "Actvity was not found for intent, " + intent.toString());
         }
     }
-
-    @Override
-    public int getSpanTypeId() {
-        return CLICK_URL_SPAN;
-    }
-
-
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeString(this.mUrl);
-    }
-
-    protected ClickableUrlSpan(Parcel in) {
-        this.mUrl = in.readString();
-    }
-
-    public static final Creator<ClickableUrlSpan> CREATOR = new Creator<ClickableUrlSpan>() {
-        @Override
-        public ClickableUrlSpan createFromParcel(Parcel source) {
-            return new ClickableUrlSpan(source);
-        }
-
-        @Override
-        public ClickableUrlSpan[] newArray(int size) {
-            return new ClickableUrlSpan[size];
-        }
-    };
 }
