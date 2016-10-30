@@ -22,7 +22,17 @@ public class Table {
         mRows.add(new TableRow());
     }
 
-    public void addToCurrentRow(String cell) {
+    public void startNewCellInCurrentRow() { mRows.get(mRows.size() - 1).addCell(""); }
+
+    public void appendToCurrentCell(CharSequence chars) {
+        mRows.get(mRows.size() - 1).appendToCurrentCell(chars);
+    }
+
+    public void removeLastCell() {
+        mRows.get(mRows.size() - 1).removeLastCell();
+    }
+
+    public void addToCurrentRow(CharSequence cell) {
         mRows.get(mRows.size() - 1).addCell(cell);
     }
 }

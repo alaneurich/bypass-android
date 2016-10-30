@@ -17,7 +17,6 @@ import in.uncod.android.bypass.Table;
 import in.uncod.android.bypass.style.ClickableUrlSpan;
 import in.uncod.android.bypass.style.HorizontalLineSpan;
 import in.uncod.android.bypass.style.TableClickSpan;
-import in.uncod.android.bypass.style.TableReplacementSpan2;
 
 public class DefaultSpanProvider extends BaseSpanProvider {
 

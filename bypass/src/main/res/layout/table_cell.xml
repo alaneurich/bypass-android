@@ -2,7 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
               android:orientation="vertical"
               android:layout_width="wrap_content"
-              android:minWidth="64dp"
+              android:maxWidth="128dp"
               android:minHeight="48dp"
               android:layout_height="wrap_content"
               android:paddingRight="8dp"
@@ -10,6 +10,7 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="center"
+        android:maxWidth="128dp"
+        android:layout_gravity="center_vertical"
         android:id="@+id/cell_content"/>
 </LinearLayout>

@@ -22,6 +22,13 @@ import in.uncod.android.bypass.provider.DefaultSpanProvider;
 import in.uncod.android.bypass.provider.TypefaceFamilyDef;
 import in.uncod.android.bypass.provider.TypefaceFormatDef;
 
+import static in.uncod.android.bypass.Element.Type.BLOCK_CODE;
+import static in.uncod.android.bypass.Element.Type.BLOCK_QUOTE;
+import static in.uncod.android.bypass.Element.Type.LINK;
+import static in.uncod.android.bypass.Element.Type.LIST;
+import static in.uncod.android.bypass.Element.Type.TABLE;
+import static in.uncod.android.bypass.Element.Type.TABLE_ROW;
+
 public class Bypass {
 	static {
 		System.loadLibrary("bypass");
@@ -41,12 +48,12 @@ public class Bypass {
 
 	// Keeps track of the ordered list number for each LIST element.
 	// We need to track multiple ordered lists at once because of nesting.
-	private final Map<Element, Integer> mOrderedListNumber = new ConcurrentHashMap<Element, Integer>();
+	private final Map<Element, Integer> mOrderedListNumber = new ConcurrentHashMap<>();
 
 	private final ArrayList<Table> mTables = new ArrayList<>();
 
 	private boolean mFinishedTable = true;
-	private boolean mFinishedTableHeaders = false;
+	private boolean mInsideTable = false;
 
 	public Bypass(Context context) {
 		this(context, null);
@@ -91,6 +98,7 @@ public class Bypass {
 
 		for (int i = 0; i < size; i++) {
 			Log.d("test", "Recursing " + document.getElement(i).getType());
+			if(document.getElement(i).getType() == TABLE || document.getElement(i).getType() == TABLE_ROW) mInsideTable = true;
 			spans[i] = recurseElement(document.getElement(i), i, size, imageGetter);
 		}
 
@@ -110,7 +118,7 @@ public class Bypass {
 		Type type = element.getType();
 
 		boolean isOrderedList = false;
-		if (type == Type.LIST) {
+		if (type == LIST) {
 			String flagsStr = element.getAttribute("flags");
 			if (flagsStr != null) {
 				int flags = Integer.parseInt(flagsStr);
@@ -140,7 +148,7 @@ public class Bypass {
 		String text = element.getText();
 		if (element.size() == 0
 				&& element.getParent() != null
-				&& element.getParent().getType() != Type.BLOCK_CODE) {
+				&& element.getParent().getType() != BLOCK_CODE) {
 			text = text.replace('\n', ' ');
 		}
 
@@ -153,25 +161,29 @@ public class Bypass {
 
 		Log.d("test", "Is Span " + element.getType() + " with Text " + element.getText());
 
+		if(mFinishedTable && mInsideTable) {
+			Table table = new Table();
+			table.startNewRow();
+			table.startNewCellInCurrentRow();
+			mTables.add(table);
+			mFinishedTable = false;
+		}
+
 		switch (type) {
 			case TABLE:
 				text = mOptions.getViewTableLinkText();
 				break;
 			case TABLE_CELL:
 				if(mOptions.isParseTables()) {
-					if (mFinishedTable) {
-						Table table = new Table();
-						table.startNewRow();
-						mTables.add(table);
-						mFinishedTable = false;
-					}
-					mTables.get(mTables.size() - 1).addToCurrentRow(text);
+					mTables.get(mTables.size() - 1).startNewCellInCurrentRow();
 					return builder;
 				}
 				break;
 			case TABLE_ROW:
 				if(mOptions.isParseTables()) {
+					mTables.get(mTables.size() - 1).removeLastCell();
 					mTables.get(mTables.size() - 1).startNewRow();
+					mTables.get(mTables.size() - 1).startNewCellInCurrentRow();
 					return builder;
 				}
 				break;
@@ -223,6 +235,12 @@ public class Bypass {
 				break;
 		}
 
+		if(mInsideTable && !(element.getType() == TABLE)) {
+			SpannableStringBuilder tableBuilder = new SpannableStringBuilder(element.getText());
+			mTables.get(mTables.size() - 1).appendToCurrentCell(setSpansOnBuilder(tableBuilder, element, imageDrawable));
+			return builder;
+		}
+
 		builder.append(text);
 		builder.append(concat);
 
@@ -236,8 +254,8 @@ public class Bypass {
 					builder.append("\n");
 				}
 			}
-			else if (element.isBlockElement() && type != Type.BLOCK_QUOTE) {
-				if (type == Type.LIST) {
+			else if (element.isBlockElement() && type != BLOCK_QUOTE) {
+				if (type == LIST) {
 					// If this is a nested list, don't include newlines
 					if (element.getParent() == null || element.getParent().getType() != Type.LIST_ITEM) {
 						builder.append("\n");
@@ -251,12 +269,17 @@ public class Bypass {
 				else {
 					builder.append("\n\n");
 				}
-			} else if(type == Type.LINK && mOptions.isAppendAuthorityToTextLinks()) {
+			} else if(type == LINK && mOptions.isAppendAuthorityToTextLinks()) {
 				String link = element.getAttribute("link");
 				builder.append(mSpanProvider.onCreateAuthorityString(link));
 			}
 		}
 
+		return setSpansOnBuilder(builder, element, imageDrawable);
+	}
+
+	private SpannableStringBuilder setSpansOnBuilder(SpannableStringBuilder builder, Element element, Drawable imageDrawable) {
+		Type type = element.getType();
 		switch (type) {
 			case TABLE:
 				if(mOptions.isParseTables()) {
@@ -265,6 +288,7 @@ public class Bypass {
 					Log.d("test", "Setting Table Span with Text: " + builder.toString());
 					setSpans(builder, mSpanProvider.onCreateTableSpans(mContext, table));
 					mFinishedTable = true;
+					mInsideTable = false;
 				}
 				break;
 			case HEADER:

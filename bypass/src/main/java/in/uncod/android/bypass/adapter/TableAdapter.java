@@ -8,7 +8,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Adapter;
 import android.widget.TextView;
 
 import com.commit451.bypass.R;
@@ -47,11 +46,11 @@ public class TableAdapter extends RecyclerView.Adapter<TableAdapter.ViewHolder> 
             builder.setSpan(new StyleSpan(BOLD), 0, builder.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
             holder.content.setText(builder, TextView.BufferType.SPANNABLE);
         } else {
-            holder.content.setText(getTableCell(position));
+            holder.content.setText(getTableCell(position), TextView.BufferType.SPANNABLE);
         }
     }
 
-    private String getTableCell(int pos) {
+    private CharSequence getTableCell(int pos) {
         int row = pos != 0 ? (int) Math.ceil(pos / mTable.getRows().get(0).getCells().size()) : 0;
         int cell = pos - (mTable.getRows().get(0).getCells().size() * row);
         Log.d("test", "Pos: " + pos + ", Determined Row: " + row + ", Determined Cell: " + cell);
