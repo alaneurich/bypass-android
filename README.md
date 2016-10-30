@@ -70,7 +70,9 @@ Setting this to `true` will append the Authority of an Autolink to it. E.g.:
 [That Search Engine](https://www.google.com)
 ```
 
-becomes [That Search Engine - (www.google.com)](https://www.google.com).
+becomes
+
+[That Search Engine - (www.google.com)](https://www.google.com).
 
 
 ##Extending SpanProvider - Full Customization
