@@ -32,8 +32,48 @@ reduce your APK size, use the ABI filtering/splitting techniques in the Android 
 http://tools.android.com/tech-docs/new-build-system/user-guide/apk-splits
 
 # Usage
-If you just want to use Bypass without using your own Spans check out http://uncodin.github.io/bypass/
+If you just want to have your Markdown parsed check out the Simple Usage Guide.
+If you want to customize either check out the Bypass.Options or the SpanProvider
+Guide.
 
+##Simple Usage
+If you want to use Bypass without customizing anything all you have to do
+is the following:
+
+```java
+TextView sampleText = (TextView) findViewById(R.id.sample_text);
+String markdown = "*[Test](https://www.google.com)*";
+
+// The this argument has to extend from
+// Context (e.g. an Activity)
+Bypass bypass = new Bypass(this);
+CharSequence string = bypass.markdownToSpannable(markdown);
+sampleText.setText(string);
+sampleText.setMovementMethod(LinkMovementMethod.getInstance());
+```
+
+##Bypass.Options - Small Customizations
+
+The original Bypass.Options already allowed for some customization but this extended
+Version allows for a lot more customizations. Some examples are provided here. For more
+examples check out the Source Code of Bypass.Options.
+
+###Appending Authority to Autolinks
+```java
+//Default is true
+setAppendAuthorityToTextLink(boolean append);
+```
+
+Setting this to `true` will append the Authority of an Autolink to it. E.g.:
+
+```markdown
+[That Search Engine](https://www.google.com)
+```
+
+becomes [That Search Engine - (www.google.com)](https://www.google.com).
+
+
+##Extending SpanProvider - Full Customization
 If you want to use your own Spans for some Elements you'll have to extend DefaultSpanProvider. E.g.:
 
 ```java
@@ -60,30 +100,6 @@ Bypass bypass = new Bypass(this, options, new CustomSpanProvider(options));
 ```
 
 That's it! :) Your CustomSpanProvider will now create all Links in Italic. And there are a lot more methods to override. Just check out the Source Code to understand how the methods normally create their Spans.
-
-##Bypass.Options - Small Customizations
-
-The original Bypass.Options already allowed for some customization but this extended
-Version allows for a lot more customizations. Some examples are provided here. For more
-examples check out the Source Code of Bypass.Options.
-
-###Appending Authority to Links
-```java
-//Default is true
-setAppendAuthorityToTextLink(boolean append);
-```
-
-Setting this to `true` will append the Authority of an Autolink to all Links. E.g.
-
-```markdown
-[That Search Engine](https://www.google.com)
-```
-
-becomes [That Search Engine - (www.google.com)](https://www.google.com).
-
-
-##Extending SpanProvider - Full Customization
-TODO
 
 #Tables
 By default Markdown Tables will be replaced with a "View Table" Link that opens a Dialog
