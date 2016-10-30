@@ -1,12 +1,13 @@
-# bypasses
-Repackaging of Bypass to allow for direct gradle dependencies
+# bypass-android
+The Android Implementation of this [Bypass Fork](https://github.com/budsmile/bypass/).
 
-[![Build Status](https://travis-ci.org/Commit451/bypasses.svg?branch=master)](https://travis-ci.org/Commit451/bypasses)
+In Addition to the original Bypass Android Module this Fork uses a SpanProvider Class that provides all spans
+for the different Markdown Tags. For easy customization it's possible to replace this class with your
+own implementation.
 
-# Gradle Dependency
-Easily reference the library in your Android projects using this dependency in your module's `build.gradle` file:
+Furthermore this fork also supports Markdown Tables.
 
-# Gradle Dependency
+# Include via Gradle
 
 Add this in your root `build.gradle` file (**not** your module `build.gradle` file):
 
@@ -59,6 +60,19 @@ Bypass bypass = new Bypass(this, options, new CustomSpanProvider(options));
 ```
 
 That's it! :) Your CustomSpanProvider will now create all Links in Italic. And there are a lot more methods to override. Just check out the Source Code to understand how the methods normally create their Spans.
+
+#Tables
+By default Markdown Tables will be replaced with a "View Table" Link that opens a Dialog
+with the Table.
+
+If you want to suppress this behaviour call
+
+```java
+setParseTables(false)
+```
+
+on your `Bypass.Options` Object.
+
 
 # Robolectric
 See [this issue](https://github.com/Commit451/bypasses/issues/2) for an explination for getting Robolectric to work.

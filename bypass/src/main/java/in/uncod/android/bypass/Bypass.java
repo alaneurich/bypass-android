@@ -161,7 +161,7 @@ public class Bypass {
 
 		Log.d("test", "Is Span " + element.getType() + " with Text " + element.getText());
 
-		if(mFinishedTable && mInsideTable) {
+		if(mOptions.isParseTables() && mFinishedTable && mInsideTable) {
 			Table table = new Table();
 			table.startNewRow();
 			table.startNewCellInCurrentRow();
@@ -171,7 +171,9 @@ public class Bypass {
 
 		switch (type) {
 			case TABLE:
-				text = mOptions.getViewTableLinkText();
+				if(mOptions.isParseTables()) {
+					text = mOptions.getViewTableLinkText();
+				}
 				break;
 			case TABLE_CELL:
 				if(mOptions.isParseTables()) {
@@ -235,7 +237,7 @@ public class Bypass {
 				break;
 		}
 
-		if(mInsideTable && !(element.getType() == TABLE)) {
+		if(mOptions.isParseTables() && mInsideTable && !(element.getType() == TABLE)) {
 			SpannableStringBuilder tableBuilder = new SpannableStringBuilder(element.getText());
 			mTables.get(mTables.size() - 1).appendToCurrentCell(setSpansOnBuilder(tableBuilder, element, imageDrawable));
 			return builder;
