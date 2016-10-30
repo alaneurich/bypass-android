@@ -61,6 +61,30 @@ Bypass bypass = new Bypass(this, options, new CustomSpanProvider(options));
 
 That's it! :) Your CustomSpanProvider will now create all Links in Italic. And there are a lot more methods to override. Just check out the Source Code to understand how the methods normally create their Spans.
 
+##Bypass.Options - Small Customizations
+
+The original Bypass.Options already allowed for some customization but this extended
+Version allows for a lot more customizations. Some examples are provided here. For more
+examples check out the Source Code of Bypass.Options.
+
+###Appending Authority to Links
+```java
+//Default is true
+setAppendAuthorityToTextLink(boolean append);
+```
+
+Setting this to `true` will append the Authority of an Autolink to all Links. E.g.
+
+```markdown
+[That Search Engine](https://www.google.com)
+```
+
+becomes [That Search Engine - (www.google.com)](https://www.google.com).
+
+
+##Extending SpanProvider - Full Customization
+TODO
+
 #Tables
 By default Markdown Tables will be replaced with a "View Table" Link that opens a Dialog
 with the Table.
