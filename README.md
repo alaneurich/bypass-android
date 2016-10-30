@@ -33,8 +33,8 @@ http://tools.android.com/tech-docs/new-build-system/user-guide/apk-splits
 
 # Usage
 If you just want to have your Markdown parsed check out the [Simple Usage Guide](#simple-usage).
-If you want to customize the Output either check out the [Bypass.Options Guide](#bypassoptions---small-customizations)
-or the [SpanProvider Guide](#extending-spanprovider---full-customization).
+If you want to customize the Output either check out the [Bypass.Options Guide](#bypassoptions)
+or the [SpanProvider Guide](#extending-spanprovider).
 
 ##Simple Usage
 If you want to use Bypass without customizing anything all you have to do
@@ -52,7 +52,8 @@ sampleText.setText(string);
 sampleText.setMovementMethod(LinkMovementMethod.getInstance());
 ```
 
-##Bypass.Options - Small Customizations
+##Bypass.Options
+*Small Customizations*
 
 The original Bypass.Options already allowed for some customization but this extended
 Version allows for a lot more customizations. Some examples are provided here. For more
@@ -75,7 +76,9 @@ will be converted to
 [That Search Engine - (www.google.com)](https://www.google.com)
 
 
-##Extending SpanProvider - Full Customization
+##Extending SpanProvider
+*Full Customization*
+
 If you want to use your own Spans for some Elements you'll have to extend DefaultSpanProvider. E.g.:
 
 ```java
