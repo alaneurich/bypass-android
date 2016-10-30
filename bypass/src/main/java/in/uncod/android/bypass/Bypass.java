@@ -140,18 +140,6 @@ public class Bypass {
 			spans[i] = recurseElement(element.children[i], i, size, imageGetter);
 		}
 
-		Log.d("test", "Span is " + type);
-
-		if(type == Type.TABLE) {
-			Log.d("test", "Is Table: " + element.getText());
-			Log.d("test", "Header Row: " + element.getAttribute("header_row"));
-			Log.d("test", "Rows: " + element.getAttribute("rows"));
-		} else if(type == Type.TABLE_CELL) {
-			Log.d("test", "Is Table Cell: " + element.getText());
-		} else if(type == Type.TABLE_ROW) {
-			Log.d("test", "Is Table Row" + element.getText());
-		}
-
 		// Clean up after we're done
 		if (isOrderedList) {
 			mOrderedListNumber.remove(this);
@@ -177,25 +165,34 @@ public class Bypass {
 
 		switch (type) {
 			case TABLE_CELL:
-				if(mFinishedTable) {
-					Table table = new Table();
-					table.startNewRow();
-					mTables.add(table);
-					mFinishedTable = false;
+				if(mOptions.isParseTables()) {
+					if (mFinishedTable) {
+						Table table = new Table();
+						table.startNewRow();
+						mTables.add(table);
+						mFinishedTable = false;
+					}
+					mTables.get(mTables.size() - 1).addToCurrentRow(text);
+					return builder;
 				}
-				mTables.get(mTables.size() - 1).addToCurrentRow(text);
-				return builder;
+				break;
 			case TABLE_ROW:
-				mTables.get(mTables.size() - 1).startNewRow();
-				return builder;
+				if(mOptions.isParseTables()) {
+					mTables.get(mTables.size() - 1).startNewRow();
+					return builder;
+				}
+				break;
 			case TABLE:
-				Table table = mTables.get(mTables.size() - 1);
-				table.removeLastRow();
-				builder.append("View Table");
-				setSpans(builder, mSpanProvider.onCreateTableSpans(table));
-				builder.append("\n");
-				mFinishedTable = true;
-				return builder;
+				if(mOptions.isParseTables()) {
+					Table table = mTables.get(mTables.size() - 1);
+					table.removeLastRow();
+					builder.append("View Table");
+					setSpans(builder, mSpanProvider.onCreateTableSpans(table));
+					builder.append("\n");
+					mFinishedTable = true;
+					return builder;
+				}
+				break;
 			case LIST:
 				if (element.getParent() != null
 						&& element.getParent().getType() == Type.LIST_ITEM) {
@@ -386,6 +383,7 @@ public class Bypass {
 		private int mHruleUnit;
 		private float mHruleSize;
 
+		private boolean mParseTables;
 		private boolean mAppendAuthorityToTextLinks;
 
 		public Options() {
@@ -419,6 +417,7 @@ public class Bypass {
 			mHruleUnit = TypedValue.COMPLEX_UNIT_DIP;
 			mHruleSize = 1;
 
+			mParseTables = true;
 			mAppendAuthorityToTextLinks = false;
 		}
 
@@ -531,6 +530,11 @@ public class Bypass {
 			return this;
 		}
 
+		public Options setParseTables(boolean parse) {
+			mParseTables = parse;
+			return this;
+		}
+
 		public float[] getHeaderSizes() {
 			return mHeaderSizes;
 		}
@@ -605,6 +609,10 @@ public class Bypass {
 
 		public boolean isAppendAuthorityToTextLinks() {
 			return mAppendAuthorityToTextLinks;
+		}
+
+		public boolean isParseTables() {
+			return mParseTables;
 		}
 	}
 
