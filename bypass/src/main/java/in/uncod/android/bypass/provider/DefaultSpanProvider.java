@@ -12,8 +12,11 @@ import android.text.style.StyleSpan;
 import android.text.style.TypefaceSpan;
 
 import in.uncod.android.bypass.Bypass;
+import in.uncod.android.bypass.Table;
 import in.uncod.android.bypass.style.ClickableUrlSpan;
 import in.uncod.android.bypass.style.HorizontalLineSpan;
+import in.uncod.android.bypass.style.TableClickSpan;
+import in.uncod.android.bypass.style.TableReplacementSpan2;
 
 public class DefaultSpanProvider extends BaseSpanProvider {
 
@@ -138,6 +141,14 @@ public class DefaultSpanProvider extends BaseSpanProvider {
     public Object[] onCreateImageSpans(Drawable drawable) {
         return new Object[] {
                 new ImageSpan(drawable)
+        };
+    }
+
+    @Override
+    public Object[] onCreateTableSpans(Table table) {
+        return new Object[] {
+                new TableReplacementSpan2(),
+                new TableClickSpan(table)
         };
     }
 

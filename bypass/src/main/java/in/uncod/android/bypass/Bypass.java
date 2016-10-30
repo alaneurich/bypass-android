@@ -8,9 +8,11 @@ import android.text.Spannable;
 import android.text.SpannableStringBuilder;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.util.Patterns;
 import android.util.TypedValue;
 
+import java.util.ArrayList;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -39,6 +41,11 @@ public class Bypass {
 	// Keeps track of the ordered list number for each LIST element.
 	// We need to track multiple ordered lists at once because of nesting.
 	private final Map<Element, Integer> mOrderedListNumber = new ConcurrentHashMap<Element, Integer>();
+
+	private final ArrayList<Table> mTables = new ArrayList<>();
+
+	private boolean mFinishedTable = true;
+	private boolean mFinishedTableHeaders = false;
 
 	/**
 	 * @deprecated Use {@link #Bypass(Context)} instead.
@@ -110,7 +117,7 @@ public class Bypass {
 	// the 'element' parameter, as in "How many siblings are you?" rather than "How many siblings do
 	// you have?".
 	private CharSequence recurseElement(Element element, int indexWithinParent, int numberOfSiblings,
-			ImageGetter imageGetter) {
+										ImageGetter imageGetter) {
 
 		Type type = element.getType();
 
@@ -128,9 +135,21 @@ public class Bypass {
 
 		int size = element.size();
 		CharSequence[] spans = new CharSequence[size];
-		
+
 		for (int i = 0; i < size; i++) {
 			spans[i] = recurseElement(element.children[i], i, size, imageGetter);
+		}
+
+		Log.d("test", "Span is " + type);
+
+		if(type == Type.TABLE) {
+			Log.d("test", "Is Table: " + element.getText());
+			Log.d("test", "Header Row: " + element.getAttribute("header_row"));
+			Log.d("test", "Rows: " + element.getAttribute("rows"));
+		} else if(type == Type.TABLE_CELL) {
+			Log.d("test", "Is Table Cell: " + element.getText());
+		} else if(type == Type.TABLE_ROW) {
+			Log.d("test", "Is Table Row" + element.getText());
 		}
 
 		// Clean up after we're done
@@ -144,8 +163,8 @@ public class Bypass {
 
 		String text = element.getText();
 		if (element.size() == 0
-			&& element.getParent() != null
-			&& element.getParent().getType() != Type.BLOCK_CODE) {
+				&& element.getParent() != null
+				&& element.getParent().getType() != Type.BLOCK_CODE) {
 			text = text.replace('\n', ' ');
 		}
 
@@ -157,9 +176,29 @@ public class Bypass {
 		}
 
 		switch (type) {
+			case TABLE_CELL:
+				if(mFinishedTable) {
+					Table table = new Table();
+					table.startNewRow();
+					mTables.add(table);
+					mFinishedTable = false;
+				}
+				mTables.get(mTables.size() - 1).addToCurrentRow(text);
+				return builder;
+			case TABLE_ROW:
+				mTables.get(mTables.size() - 1).startNewRow();
+				return builder;
+			case TABLE:
+				Table table = mTables.get(mTables.size() - 1);
+				table.removeLastRow();
+				builder.append("View Table");
+				setSpans(builder, mSpanProvider.onCreateTableSpans(table));
+				builder.append("\n");
+				mFinishedTable = true;
+				return builder;
 			case LIST:
 				if (element.getParent() != null
-					&& element.getParent().getType() == Type.LIST_ITEM) {
+						&& element.getParent().getType() == Type.LIST_ITEM) {
 					builder.append("\n");
 				}
 				break;
@@ -207,7 +246,7 @@ public class Bypass {
 
 		builder.append(text);
 		builder.append(concat);
-		
+
 		// Don't auto-append whitespace after last item in document. The 'numberOfSiblings'
 		// is the number of children the parent of the current element has (including the
 		// element itself), hence subtracting a number from that count gives us the index
@@ -226,7 +265,7 @@ public class Bypass {
 					}
 				}
 				else if (element.getParent() != null
-					&& element.getParent().getType() == Type.LIST_ITEM) {
+						&& element.getParent().getType() == Type.LIST_ITEM) {
 					// List items should never double-space their entries
 					builder.append("\n");
 				}
@@ -351,12 +390,12 @@ public class Bypass {
 
 		public Options() {
 			mHeaderSizes = new float[] {
-				1.5f, // h1
-				1.4f, // h2
-				1.3f, // h3
-				1.2f, // h4
-				1.1f, // h5
-				1.0f, // h6
+					1.5f, // h1
+					1.4f, // h2
+					1.3f, // h3
+					1.2f, // h4
+					1.1f, // h5
+					1.0f, // h6
 			};
 
 			mUnorderedListItem = "\u2022";

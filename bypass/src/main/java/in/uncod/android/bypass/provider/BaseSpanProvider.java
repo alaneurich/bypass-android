@@ -3,6 +3,7 @@ package in.uncod.android.bypass.provider;
 import android.graphics.drawable.Drawable;
 
 import in.uncod.android.bypass.Bypass;
+import in.uncod.android.bypass.Table;
 
 public abstract class BaseSpanProvider {
     public static final String TYPEFACE_FAMILY_DEFAULT = "default";
@@ -28,6 +29,7 @@ public abstract class BaseSpanProvider {
     public abstract Object[] onCreateStrikethroughSpans();
     public abstract Object[] onCreateHorizontalLineSpans(int lineHeight, int lineTopBottomPadding);
     public abstract Object[] onCreateImageSpans(Drawable imageDrawable);
+    public abstract Object[] onCreateTableSpans(Table table);
 
     public abstract String onCreateAuthorityString(String url);
 }
