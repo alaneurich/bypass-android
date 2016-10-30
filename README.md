@@ -32,9 +32,9 @@ reduce your APK size, use the ABI filtering/splitting techniques in the Android 
 http://tools.android.com/tech-docs/new-build-system/user-guide/apk-splits
 
 # Usage
-If you just want to have your Markdown parsed check out the Simple Usage Guide.
-If you want to customize either check out the Bypass.Options or the SpanProvider
-Guide.
+If you just want to have your Markdown parsed check out the [Simple Usage Guide](#simple-usage).
+If you want to customize the Output either check out the [Bypass.Options Guide](#bypassoptions---small-customizations)
+or the [SpanProvider Guide](#extending-spanprovider---full-customization).
 
 ##Simple Usage
 If you want to use Bypass without customizing anything all you have to do
