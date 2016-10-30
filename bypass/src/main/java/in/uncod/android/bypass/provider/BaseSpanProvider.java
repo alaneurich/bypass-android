@@ -1,5 +1,6 @@
 package in.uncod.android.bypass.provider;
 
+import android.content.Context;
 import android.graphics.drawable.Drawable;
 
 import in.uncod.android.bypass.Bypass;
@@ -29,7 +30,7 @@ public abstract class BaseSpanProvider {
     public abstract Object[] onCreateStrikethroughSpans();
     public abstract Object[] onCreateHorizontalLineSpans(int lineHeight, int lineTopBottomPadding);
     public abstract Object[] onCreateImageSpans(Drawable imageDrawable);
-    public abstract Object[] onCreateTableSpans(Table table);
+    public abstract Object[] onCreateTableSpans(Context context, Table table);
 
     public abstract String onCreateAuthorityString(String url);
 }

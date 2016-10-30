@@ -18,32 +18,23 @@ import in.uncod.android.bypass.adapter.TableAdapter;
 
 public class TableClickSpan extends ClickableSpan {
 
+    private String mTitle;
     private Table mTable;
 
-    public TableClickSpan(Table table) {
+    public TableClickSpan(String title, Table table) {
+        mTitle = title;
         mTable = table;
     }
 
     @Override
     public void onClick(View view) {
-        ArrayList<TableRow> rows = mTable.getRows();
-        int count = 0;
-        String tableRow = "";
-        for (TableRow row : rows) {
-            ArrayList<String> cells = row.getCells();
-            for (String cell : cells) {
-                tableRow += cell + ", ";
-            }
-            tableRow += "\n";
-            count++;
-        }
         View containerView = LayoutInflater.from(view.getContext()).inflate(R.layout.table_dialog, null);
         RecyclerView recView = (RecyclerView) containerView.findViewById(R.id.rec_view);
         recView.setLayoutManager(new GridLayoutManager(view.getContext(), mTable.getRows().get(0).getCells().size(),
                 GridLayoutManager.VERTICAL, false));
         recView.setAdapter(new TableAdapter(mTable));
         new AlertDialog.Builder(view.getContext())
-                .setTitle("Table")
+                .setTitle(mTitle)
                 .setView(containerView)
                 .show();
     }

@@ -1,5 +1,6 @@
 package in.uncod.android.bypass.provider;
 
+import android.content.Context;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
@@ -145,10 +146,9 @@ public class DefaultSpanProvider extends BaseSpanProvider {
     }
 
     @Override
-    public Object[] onCreateTableSpans(Table table) {
+    public Object[] onCreateTableSpans(Context context, Table table) {
         return new Object[] {
-                new TableReplacementSpan2(),
-                new TableClickSpan(table)
+                new TableClickSpan(mOptions.getTableDialogTitle(), table)
         };
     }
 

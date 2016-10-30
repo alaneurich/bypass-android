@@ -27,6 +27,7 @@ public class Bypass {
 		System.loadLibrary("bypass");
 	}
 
+	private Context mContext;
 	private final Options mOptions;
 
 	private final BaseSpanProvider mSpanProvider;
@@ -47,23 +48,8 @@ public class Bypass {
 	private boolean mFinishedTable = true;
 	private boolean mFinishedTableHeaders = false;
 
-	/**
-	 * @deprecated Use {@link #Bypass(Context)} instead.
-	 */
-	@Deprecated
-	public Bypass() {
-		// Default constructor for backwards-compatibility
-		mOptions = new Options();
-		mListItemIndent = 20;
-		mBlockQuoteIndent = 10;
-		mCodeBlockIndent = 10;
-		mHruleSize = 2;
-		mHruleTopBottomPadding = 20;
-		mSpanProvider = new DefaultSpanProvider(mOptions);
-	}
-
 	public Bypass(Context context) {
-		this(context, new Options());
+		this(context, null);
 	}
 
 	public Bypass(Context context, Options options) {
@@ -71,6 +57,7 @@ public class Bypass {
 	}
 
 	public Bypass(Context context, Options options, BaseSpanProvider spanProvider) {
+		mContext = context;
 		mOptions = options != null ? options : new Options();
 
 		DisplayMetrics dm = context.getResources().getDisplayMetrics();
@@ -103,6 +90,7 @@ public class Bypass {
 		CharSequence[] spans = new CharSequence[size];
 
 		for (int i = 0; i < size; i++) {
+			Log.d("test", "Recursing " + document.getElement(i).getType());
 			spans[i] = recurseElement(document.getElement(i), i, size, imageGetter);
 		}
 
@@ -163,7 +151,12 @@ public class Bypass {
 			imageDrawable = imageGetter.getDrawable(element.getAttribute("link"));
 		}
 
+		Log.d("test", "Is Span " + element.getType() + " with Text " + element.getText());
+
 		switch (type) {
+			case TABLE:
+				text = mOptions.getViewTableLinkText();
+				break;
 			case TABLE_CELL:
 				if(mOptions.isParseTables()) {
 					if (mFinishedTable) {
@@ -179,17 +172,6 @@ public class Bypass {
 			case TABLE_ROW:
 				if(mOptions.isParseTables()) {
 					mTables.get(mTables.size() - 1).startNewRow();
-					return builder;
-				}
-				break;
-			case TABLE:
-				if(mOptions.isParseTables()) {
-					Table table = mTables.get(mTables.size() - 1);
-					table.removeLastRow();
-					builder.append("View Table");
-					setSpans(builder, mSpanProvider.onCreateTableSpans(table));
-					builder.append("\n");
-					mFinishedTable = true;
 					return builder;
 				}
 				break;
@@ -276,6 +258,15 @@ public class Bypass {
 		}
 
 		switch (type) {
+			case TABLE:
+				if(mOptions.isParseTables()) {
+					Table table = mTables.get(mTables.size() - 1);
+					table.removeLastRow();
+					Log.d("test", "Setting Table Span with Text: " + builder.toString());
+					setSpans(builder, mSpanProvider.onCreateTableSpans(mContext, table));
+					mFinishedTable = true;
+				}
+				break;
 			case HEADER:
 				String levelStr = element.getAttribute("level");
 				int level = Integer.parseInt(levelStr);
@@ -358,6 +349,9 @@ public class Bypass {
 	public static final class Options {
 		private float[] mHeaderSizes;
 
+		private String mViewTableLinkText;
+		private String mTableDialogTitle;
+
 		private String mUnorderedListItem;
 		private int mListItemIndentUnit;
 		private float mListItemIndentSize;
@@ -396,6 +390,9 @@ public class Bypass {
 					1.0f, // h6
 			};
 
+			mViewTableLinkText = "View Table";
+			mTableDialogTitle = "Table";
+
 			mUnorderedListItem = "\u2022";
 			mListItemIndentUnit = TypedValue.COMPLEX_UNIT_DIP;
 			mListItemIndentSize = 10;
@@ -419,6 +416,16 @@ public class Bypass {
 
 			mParseTables = true;
 			mAppendAuthorityToTextLinks = false;
+		}
+
+		public Options setViewTableLinkText(String viewTableLinkText) {
+			mViewTableLinkText = viewTableLinkText;
+			return this;
+		}
+
+		public Options setTableDialogTitle(String tableDialogTitle) {
+			mTableDialogTitle = tableDialogTitle;
+			return this;
 		}
 
 		public Options setHeaderSizes(float[] headerSizes) {
@@ -537,6 +544,14 @@ public class Bypass {
 
 		public float[] getHeaderSizes() {
 			return mHeaderSizes;
+		}
+
+		public String getViewTableLinkText() {
+			return mViewTableLinkText;
+		}
+
+		public String getTableDialogTitle() {
+			return mTableDialogTitle;
 		}
 
 		public String getUnorderedListItem() {
