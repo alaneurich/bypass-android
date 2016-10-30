@@ -2,7 +2,7 @@
 The Android Implementation of this [Bypass Fork](https://github.com/budsmile/bypass/).
 
 In Addition to the original Bypass Android Module this Fork uses a SpanProvider Class that provides all spans
-for the different Markdown Tags. For easy customization it's possible to replace this class with your
+for the different Markdown Tags. For full customization it's possible to replace this class with your
 own implementation.
 
 Furthermore this fork also supports Markdown Tables.
@@ -70,9 +70,9 @@ Setting this to `true` will append the Authority of an Autolink to it. E.g.:
 [That Search Engine](https://www.google.com)
 ```
 
-becomes
+will be converted to
 
-[That Search Engine - (www.google.com)](https://www.google.com).
+[That Search Engine - (www.google.com)](https://www.google.com)
 
 
 ##Extending SpanProvider - Full Customization
