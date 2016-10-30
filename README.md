@@ -23,7 +23,7 @@ allprojects {
 Then, add the library to your project `build.gradle`
 ```gradle
 dependencies {
-    compile 'com.github.budsmile:bypass-android:1.0.1'
+    compile 'com.github.budsmile:bypass-android:1.0.2'
 }
 ```
 
@@ -68,7 +68,7 @@ with the Table.
 If you want to suppress this behaviour call
 
 ```java
-setParseTables(false)
+setParseTables(false);
 ```
 
 on your `Bypass.Options` Object.
