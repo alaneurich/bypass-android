@@ -83,7 +83,8 @@ public class Bypass {
 
 		mHruleTopBottomPadding = (int) dm.density * 10;
 
-		mSpanProvider = spanProvider != null ? spanProvider : new DefaultSpanProvider(mOptions);
+		mSpanProvider = spanProvider != null ? spanProvider : new DefaultSpanProvider();
+		mSpanProvider.setOptions(mOptions);
 	}
 
 	public CharSequence markdownToSpannable(String markdown) {

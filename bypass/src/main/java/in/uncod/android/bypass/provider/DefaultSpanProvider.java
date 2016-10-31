@@ -20,6 +20,11 @@ import in.uncod.android.bypass.style.TableClickSpan;
 
 public class DefaultSpanProvider extends BaseSpanProvider {
 
+    public DefaultSpanProvider() {
+        super();
+    }
+
+    @Deprecated
     public DefaultSpanProvider(Bypass.Options bypassOptions) {
         super(bypassOptions);
     }

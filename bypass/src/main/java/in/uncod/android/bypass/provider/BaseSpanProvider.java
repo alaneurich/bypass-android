@@ -14,9 +14,14 @@ public abstract class BaseSpanProvider {
 
     protected Bypass.Options mOptions;
 
+    public BaseSpanProvider() {}
+
+    @Deprecated
     public BaseSpanProvider(Bypass.Options bypassOptions) {
-        mOptions = bypassOptions;
+        setOptions(bypassOptions);
     }
+
+    public void setOptions(Bypass.Options bypassOptions) { mOptions = bypassOptions; }
 
     public abstract Object[] onCreateHeaderSpans(int level);
     public abstract Object[] onCreateListSpans(int listItemIndent);

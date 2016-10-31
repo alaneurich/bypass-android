@@ -23,7 +23,7 @@ allprojects {
 Then, add the library to your project `build.gradle`
 ```gradle
 dependencies {
-    compile 'com.github.budsmile:bypass-android:1.0.2'
+    compile 'com.github.budsmile:bypass-android:1.0.3'
 }
 ```
 
@@ -83,10 +83,6 @@ If you want to use your own Spans for some Elements you'll have to extend Defaul
 
 ```java
 class CustomSpanProvider extends DefaultSpanProvider {
-    public CustomSpanProvider(Bypass.Options bypassOptions) {
-        super(bypassOptions);
-    }
-
     @Override
     public Object[] onCreateLinkSpans(String url) {
         return new Object[] {
@@ -101,7 +97,7 @@ Now, when instantiating Bypass just do the following:
 
 ```java
 Bypass.Options options = new Bypass.Options();
-Bypass bypass = new Bypass(this, options, new CustomSpanProvider(options));
+Bypass bypass = new Bypass(this, options, new CustomSpanProvider());
 ```
 
 That's it! :) Your CustomSpanProvider will now create all Links in Italic. And there are a lot more methods to override. Just check out the Source Code to understand how the methods normally create their Spans.
