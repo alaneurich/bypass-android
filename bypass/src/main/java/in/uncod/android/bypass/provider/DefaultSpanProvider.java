@@ -24,11 +24,6 @@ public class DefaultSpanProvider extends BaseSpanProvider {
         super();
     }
 
-    @Deprecated
-    public DefaultSpanProvider(Bypass.Options bypassOptions) {
-        super(bypassOptions);
-    }
-
     @Override
     public Object[] onCreateHeaderSpans(int level) {
         return new Object[] {

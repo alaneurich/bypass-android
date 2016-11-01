@@ -3,6 +3,7 @@ package in.uncod.android.bypass.adapter;
 import android.support.v7.widget.RecyclerView;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
+import android.text.method.LinkMovementMethod;
 import android.text.style.StyleSpan;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -41,6 +42,7 @@ public class TableAdapter extends RecyclerView.Adapter<TableAdapter.ViewHolder> 
     @Override
     public void onBindViewHolder(TableAdapter.ViewHolder holder, int position) {
         int row = position != 0 ? (int) Math.ceil(position / mTable.getRows().get(0).getCells().size()) : 0;
+        holder.content.setMovementMethod(LinkMovementMethod.getInstance());
         if(row == 0) {
             SpannableStringBuilder builder = new SpannableStringBuilder(getTableCell(position));
             builder.setSpan(new StyleSpan(BOLD), 0, builder.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);

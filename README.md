@@ -23,7 +23,7 @@ allprojects {
 Then, add the library to your project `build.gradle`
 ```gradle
 dependencies {
-    compile 'com.github.budsmile:bypass-android:1.0.3'
+    compile 'com.github.budsmile:bypass-android:1.0.4'
 }
 ```
 

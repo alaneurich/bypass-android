@@ -16,11 +16,6 @@ public abstract class BaseSpanProvider {
 
     public BaseSpanProvider() {}
 
-    @Deprecated
-    public BaseSpanProvider(Bypass.Options bypassOptions) {
-        setOptions(bypassOptions);
-    }
-
     public void setOptions(Bypass.Options bypassOptions) { mOptions = bypassOptions; }
 
     public abstract Object[] onCreateHeaderSpans(int level);
