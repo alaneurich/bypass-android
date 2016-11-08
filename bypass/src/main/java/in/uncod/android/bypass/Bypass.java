@@ -172,18 +172,18 @@ public class Bypass {
 
 		switch (type) {
 			case TABLE:
-				if(mOptions.isParseTables()) {
+				if(mOptions.isParseTables() && mInsideTable) {
 					text = mOptions.getViewTableLinkText();
 				}
 				break;
 			case TABLE_CELL:
-				if(mOptions.isParseTables()) {
+				if(mOptions.isParseTables() && mInsideTable) {
 					mTables.get(mTables.size() - 1).startNewCellInCurrentRow();
 					return builder;
 				}
 				break;
 			case TABLE_ROW:
-				if(mOptions.isParseTables()) {
+				if(mOptions.isParseTables() && mInsideTable) {
 					mTables.get(mTables.size() - 1).removeLastCell();
 					mTables.get(mTables.size() - 1).startNewRow();
 					mTables.get(mTables.size() - 1).startNewCellInCurrentRow();
